@@ -1,0 +1,11 @@
+# Ignore environment files
+/node_modules
+.env
+.env.local
+.env.development
+.env.production
+
+# Ignore uploads
+uploads/tours
+# Ignore logs
+uploads/profile
