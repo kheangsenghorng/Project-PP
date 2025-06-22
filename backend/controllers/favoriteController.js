@@ -195,7 +195,7 @@ export const getUserFavoriteTours = async (req, res) => {
     const { userId } = req.params;
 
     const baseUrl =
-      process.env.BASE_URL || `${req.protocol}://${req.get("host")}`;
+      process.env.BASE_URL || `${req.protocol}:/${req.get("host")}`;
 
     if (!userId) {
       return res.status(400).json({ message: "User ID is required" });
@@ -250,8 +250,7 @@ export const getUserFavoriteTours = async (req, res) => {
     const updatedTours = tours.map((tour) => ({
       ...tour,
       galleryImages:
-        tour.galleryImages?.map((img) => `${baseUrl}/uploads/tours/${img}`) ||
-        [],
+        tour.galleryImages?.map((img) => `${baseUrl}/${img}`) || [],
     }));
 
     res.status(200).json({

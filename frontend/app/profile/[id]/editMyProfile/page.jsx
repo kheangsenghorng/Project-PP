@@ -81,7 +81,6 @@ export default function ProfilePage() {
   }, [user]);
   const imageUrl = getCloudinaryUrl(user?.profile_image);
 
-
   useEffect(() => {
     if (address) {
       setFormAddress({
@@ -192,7 +191,9 @@ export default function ProfilePage() {
             <div className="flex flex-col items-center">
               <div className="relative">
                 <Avatar className="h-24 w-24">
-                  {imageUrl && isValidUrl(imageUrl) ? (
+                  {previewImage ? (
+                    <AvatarImage src={previewImage} />
+                  ) : imageUrl && isValidUrl(imageUrl) ? (
                     <AvatarImage src={imageUrl} key={imageKey} />
                   ) : (
                     <AvatarFallback>
