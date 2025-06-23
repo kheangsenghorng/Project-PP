@@ -87,7 +87,7 @@ function CategoryList() {
     <div className="container mx-auto py-8">
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
-          <CardTitle className="text-2xl font-bold">Destinations</CardTitle>
+          <CardTitle className="text-2xl font-bold">Category</CardTitle>
           <Button onClick={() => setPopupOpen(true)}>
             <FiPlus className="mr-2" />
             Add Category

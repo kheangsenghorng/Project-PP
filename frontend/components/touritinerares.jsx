@@ -25,6 +25,8 @@ import { useTourStore } from "@/store/tourStore";
 
 export default function TourItinerary() {
   const { tourId } = useParams();
+  const [visibleCount, setVisibleCount] = useState(3);
+
   const [showEndInfo, setShowEndInfo] = useState(false);
   const { loading, error, fetchTour, tour, itineraries = [] } = useTourStore();
 
@@ -161,7 +163,7 @@ export default function TourItinerary() {
       <div className="p-5">
         <div className="relative">
           {Array.isArray(itineraries) &&
-            itineraries.map((item, index) => {
+            itineraries.slice(0, visibleCount).map((item, index) => {
               const formattedDate = item?.date
                 ? new Date(item.date).toLocaleDateString("km-KH", {
                     day: "2-digit",
@@ -170,9 +172,11 @@ export default function TourItinerary() {
                   })
                 : "";
 
+              const isLastVisible = index === visibleCount - 1;
+
               return (
-                <div key={index} className="flex mb-8 relative">
-                  <div className="flex flex-col items-center mr-4">
+                <div key={item._id || index} className="flex mb-8 relative">
+                  <div className="flex flex-col items-center mr-4 relative">
                     <div
                       className={`rounded-full h-10 w-10 flex items-center justify-center z-10 shadow-sm ${
                         item.day
@@ -186,10 +190,12 @@ export default function TourItinerary() {
                         <span>{index + 1}</span>
                       )}
                     </div>
-                    {index < itineraries.length - 1 && (
-                      <div className="w-0.5 bg-gray-200 h-full absolute top-10 left-5 -ml-[1px]"></div>
+
+                    {!isLastVisible && (
+                      <div className="w-0.5 bg-gray-200 h-full absolute top-10 left-1/2 -translate-x-1/2"></div>
                     )}
                   </div>
+
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
                       <Calendar className="h-3 w-3 text-teal-600" />
@@ -197,6 +203,7 @@ export default function TourItinerary() {
                         {formattedDate}
                       </div>
                     </div>
+
                     <Card className="border-gray-100 shadow-sm hover:shadow-md transition-shadow">
                       <CardContent className="p-3">
                         <h3 className="font-medium text-gray-900 text-lg">
@@ -213,6 +220,7 @@ export default function TourItinerary() {
                             <Clock className="h-3 w-3" />
                             {item.startTime} - {item.endTime}
                           </Badge>
+
                           {item.day && (
                             <>
                               <Badge
@@ -238,6 +246,19 @@ export default function TourItinerary() {
                 </div>
               );
             })}
+
+          {/* ✅ Show More Button */}
+          {visibleCount < itineraries.length && (
+            <div className="flex justify-center mt-4">
+              <Button
+                variant="outline"
+                className="border-teal-200 text-teal-700 hover:bg-teal-50"
+                onClick={() => setVisibleCount((prev) => prev + 3)}
+              >
+                Show More
+              </Button>
+            </div>
+          )}
         </div>
 
         {showEndInfo && <TourEndInfo />}
@@ -368,4 +389,3 @@ export default function TourItinerary() {
     </div>
   );
 }
-  

@@ -5,11 +5,12 @@ import { useItineraryStore } from "@/store/itinerariesStore";
 import { Star } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function PhnomPenhTour() {
   const router = useRouter(); // ✅ initialize router
   const { tourId } = useParams();
+  const [visibleCount, setVisibleCount] = useState(5); // initial visible itineraries count
   const { tour, loading, error, fetchTour } = useTourStore();
   const {
     fetchItinerariesByTourId,
@@ -45,6 +46,10 @@ export default function PhnomPenhTour() {
       router.back();
     }
   }, [tour, router]);
+
+  const handleShowMore = () => {
+    setVisibleCount((prev) => prev + 5); // load 5 more each time
+  };
 
   if (loading) return <p className="text-center text-lg">Loading...</p>;
   if (error) return <p className="text-center text-red-500">Error: {error}</p>;
@@ -90,7 +95,6 @@ export default function PhnomPenhTour() {
             Lunch and Skywalk
           </p>
         </div>
-
         {/* Itinerary Section */}
         <div className="bg-white p-6 rounded-lg mt-6">
           <Link href="#Explore" id="Itinerary">
@@ -98,6 +102,7 @@ export default function PhnomPenhTour() {
               Itinerary
             </h2>
           </Link>
+
           {itinerariesError && (
             <p className="text-red-500">{itinerariesError}</p>
           )}
@@ -107,7 +112,7 @@ export default function PhnomPenhTour() {
           )}
 
           <div className="border-l-2 border-gray-300 ml-4">
-            {itineraries.map((item, index) => {
+            {itineraries.slice(0, visibleCount).map((item, index) => {
               const formattedDate = item?.date
                 ? new Date(item.date).toLocaleDateString("en-GB", {
                     day: "2-digit",
@@ -135,6 +140,15 @@ export default function PhnomPenhTour() {
               );
             })}
           </div>
+
+          {visibleCount < itineraries.length && (
+            <button
+              onClick={handleShowMore}
+              className="mt-4 text-blue-600 hover:underline font-medium"
+            >
+              Show More
+            </button>
+          )}
         </div>
       </div>
     </div>

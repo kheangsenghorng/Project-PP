@@ -40,8 +40,8 @@ const Reviews = () => {
   if (isLoading)
     return <div className="text-center text-gray-500">Loading reviews...</div>;
 
-  if (error)
-    return <div className="text-center text-red-500 font-medium">{error}</div>;
+  // if (error)
+  //   return <div className="text-center text-red-500 font-medium">{error}</div>;
 
   if (!reviews.length)
     return <div className="text-center text-gray-500">No reviews yet.</div>;

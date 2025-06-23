@@ -119,7 +119,6 @@ export default function Home() {
     filter === "highest"
       ? [...tours].sort((a, b) => b.price - a.price)
       : [...tours].sort((a, b) => a.price - b.price);
-      
 
   const getAccommodationFeatures = (binaryString) => {
     return Object.keys(accommodationIcons)
@@ -263,10 +262,18 @@ export default function Home() {
                       }
                     >
                       <h2 className="text-xl font-semibold mb-2 hover:text-rose-600">
-                        {tour.first_destination?.name
-                          ? tour.start_location?.name
-                            ? `${tour.start_location.name} ↔ ${tour.first_destination.name}`
-                            : tour.first_destination.name
+                        {tour.start_location?.name &&
+                        tour.first_destination?.name &&
+                        tour.second_destination?.name
+                          ? `${tour.start_location.name} ↔ ${tour.first_destination.name} ↔ ${tour.second_destination.name}`
+                          : tour.start_location?.name &&
+                            tour.first_destination?.name
+                          ? `${tour.start_location.name} ↔ ${tour.first_destination.name}`
+                          : tour.first_destination?.name &&
+                            tour.second_destination?.name
+                          ? `${tour.first_destination.name} ↔ ${tour.second_destination.name}`
+                          : tour.first_destination?.name
+                          ? tour.first_destination.name
                           : tour.start_location?.name}
                       </h2>
                     </Link>

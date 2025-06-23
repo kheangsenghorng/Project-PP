@@ -15,12 +15,12 @@ export default function Home() {
     },
     {
       name: "Chan Sreynet",
-      image: "/placeholder.svg?height=200&width=200",
+      image: "/image/me.png",
       socials: ["facebook", "twitter", "instagram"],
     },
     {
       name: "Kheang Senghong",
-      image: "/image/about-image-4.png",
+      image: "/image/image.png",
       socials: ["facebook", "twitter", "instagram"],
     },
     {
@@ -71,7 +71,7 @@ export default function Home() {
           </div>
           <div className="flex justify-center">
             <Image
-                src="/image/about-image-2.png"
+              src="/image/about-image-2.png"
               alt="Illustration"
               width={200}
               height={200}
@@ -124,7 +124,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-8">
           <TravelSection
             title="Travel With Us"
-            image="/placeholder.svg?height=300&width=300"
+            image="/image/login1.jpg"
             description="No matter who you are or where you're headed, Travel With Us helps make it one of a lifetime. Find the perfect trip that suits your needs, and let us take care of the rest. Your worry-free travel awaits."
           />
           <TravelSection
