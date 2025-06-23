@@ -159,7 +159,7 @@ export default function TourManagement() {
     }
   };
 
-  const statusOptions = ["all", "Available", "Ongoing", "Full", "Close"];
+  const statusOptions = ["all", "Ongoing", "Full", "Close"];
 
   return (
     <div className="space-y-6">

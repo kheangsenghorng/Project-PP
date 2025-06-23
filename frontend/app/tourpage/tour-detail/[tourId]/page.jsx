@@ -10,7 +10,7 @@ import { useParams } from "next/navigation";
 export default function PageTour() {
   const { tourId } = useParams();
   return (
-    <div>
+    <div className="w-[1200px] mx-auto relative">
       <Gallery tourId={tourId} />
       <Exlpore />
       <div className="flex justify-between mx-auto w-[1200px]">
@@ -19,7 +19,7 @@ export default function PageTour() {
           <CardRoomType />
           <Reviews />
         </div>
-        <div>
+        <div className="w-[500px] sticky top-20 h-screen overflow-y-auto">
           <BookingForm />
         </div>
       </div>

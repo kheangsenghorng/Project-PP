@@ -14,6 +14,7 @@ export default function AdditionalInfo() {
 
   const [isCreating, setIsCreating] = useState(false);
   const [newText, setNewText] = useState("");
+  const [visibleCount, setVisibleCount] = useState(5);
 
   const {
     infoItems,
@@ -79,13 +80,11 @@ export default function AdditionalInfo() {
       )}
 
       {/* Error State */}
-      {error && (
-        <div className="text-sm text-red-500 mb-2">Error: {error}</div>
-      )}
+      {error && <div className="text-sm text-red-500 mb-2">Error: {error}</div>}
 
       {/* Info Items */}
       <div className="space-y-3">
-        {infoItems.map((item, index) => (
+        {infoItems.slice(0, visibleCount).map((item, index) => (
           <div
             key={item._id}
             className="flex items-center justify-between bg-gray-50 rounded-md p-3"
@@ -150,6 +149,16 @@ export default function AdditionalInfo() {
                 onClick={handleCancelCreate}
               />
             </div>
+          </div>
+        )}
+        {visibleCount < infoItems.length && (
+          <div className="flex justify-center pt-2">
+            <button
+              onClick={() => setVisibleCount((prev) => prev + 5)}
+              className="text-sm text-blue-600 hover:underline"
+            >
+              Show More
+            </button>
           </div>
         )}
       </div>
