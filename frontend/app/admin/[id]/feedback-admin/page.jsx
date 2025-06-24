@@ -285,9 +285,9 @@ export default function TourManagement() {
                           )}
                         </div>
                       </th>
-                      <th className="py-3 px-4 text-left font-medium text-xs text-muted-foreground">
+                      {/* <th className="py-3 px-4 text-left font-medium text-xs text-muted-foreground">
                         ACTIONS
-                      </th>
+                      </th> */}
                     </tr>
                   </thead>
                   <tbody>
@@ -346,14 +346,12 @@ export default function TourManagement() {
                                 size={14}
                                 className="mr-2 text-muted-foreground"
                               />
-                              <div className="flex flex-col">
-                                <span>{tour.start_location.name || "N/A"}</span>
-                                <span className="text-muted-foreground text-nowrap">
-                                  {tour.start_location?.name || "N/A"}
-                                  {tour.first_destination?.name &&
-                                    ` → ${tour.first_destination.name}`}
-                                  {tour.second_destination?.name &&
-                                    ` → ${tour.second_destination.name}`}
+                              <div className="flex flex-col text-nowrap">
+                                <span>{tour?.start_location?.name}</span>
+                                <span className="text-muted-foreground">
+                                  {tour?.first_destination?.name}
+                                  {tour?.second_destination?.name &&
+                                    ` → ${tour.second_destination?.name}`}
                                 </span>
                               </div>
                             </div>
@@ -393,7 +391,7 @@ export default function TourManagement() {
                               {tour.status}
                             </Badge>
                           </td>
-                          <td className="py-3 px-4 text-sm">
+                          {/* <td className="py-3 px-4 text-sm">
                             <div className="flex gap-1">
                               <TooltipProvider>
                                 <Tooltip>
@@ -431,7 +429,7 @@ export default function TourManagement() {
                                 </Tooltip>
                               </TooltipProvider>
                             </div>
-                          </td>
+                          </td> */}
                         </tr>
                       ))
                     ) : (

@@ -30,7 +30,7 @@ const profileStorage = multer.diskStorage({
 
 // Storage for tour uploads
 const tourStorage = multer.diskStorage({
-  destination: "./uploads/tours",
+  destination: "tours",
   filename: (req, file, cb) => {
     cb(
       null,
@@ -79,32 +79,25 @@ export const deleteFromCloudinary = async (public_id) => {
   }
 };
 
-export const uploadTourImages = (req, res) => {
-  uploadMultiple(req, res, async (err) => {
-    if (err) return res.status(400).json({ message: err.message });
 
-    try {
-      const urls = [];
-      for (const file of req.files) {
-        const result = await cloudinary.uploader.upload(file.path, {
-          folder: "tours",
-        });
-        urls.push(result.secure_url);
 
-        // Optional: delete local file after upload
-        fs.unlinkSync(file.path);
-      }
+// Improved storage configuration
+export const customTourStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    const uploadPath = "tours";
+    fs.mkdirSync(uploadPath, { recursive: true }); // recursive: true makes existsSync check unnecessary
+    cb(null, uploadPath);
+  },
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname).toLowerCase();
+    const uniqueName = `file-${Date.now()}-${Math.random().toString(36).substring(2, 9)}${ext}`;
+    cb(null, uniqueName);
+  },
+});
 
-      res.status(200).json({ message: "Images uploaded", urls });
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  });
-};
-
-// Middleware for multiple file uploads (Tours)
+// Multer instance with proper error handling
 export const uploadMultiple = multer({
-  storage: tourStorage,
-  limits: { fileSize: 2 * 1024 * 1024 }, // 1MB limit
+  storage: customTourStorage, // Fixed variable name
   fileFilter: (req, file, cb) => checkFileType(file, cb),
-}).array("files", 40);
+  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB limit
+}).array("files", 40); // Max 40 files
