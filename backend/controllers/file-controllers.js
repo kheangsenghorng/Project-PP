@@ -147,19 +147,16 @@ export const uploadMultipleFiles = async (req, res) => {
     const files = req.files;
 
     if (!files || files.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: "No files uploaded",
-      });
+      return res
+        .status(400)
+        .json({ success: false, message: "No files uploaded" });
     }
 
-    // ✅ Check if tour exists
     const tour = await Tour.findById(tourId);
     if (!tour) {
-      return res.status(404).json({
-        success: false,
-        message: "Tour not found",
-      });
+      return res
+        .status(404)
+        .json({ success: false, message: "Tour not found" });
     }
 
     const existingImages = new Set(tour.galleryImages);
@@ -167,29 +164,28 @@ export const uploadMultipleFiles = async (req, res) => {
     const skippedFiles = [];
 
     for (const file of files) {
-      // ✅ Upload and let Cloudinary assign unique ID
       const result = await cloudinary.uploader.upload(file.path, {
         folder: "tours",
       });
-
-      // Only store public_id like "tours/dxkflm3eojukubzn1xyc"
       const publicId = result.public_id;
 
       if (existingImages.has(publicId)) {
         skippedFiles.push(file.originalname);
-        fs.unlinkSync(file.path);
-        continue;
+      } else {
+        uploadedPublicIds.push(publicId);
+        tour.galleryImages.push(publicId);
       }
 
-      uploadedPublicIds.push(publicId);
-      tour.galleryImages.push(publicId);
-
-      fs.unlinkSync(file.path); // cleanup tmp file
+      try {
+        fs.unlinkSync(file.path); // Clean temp file
+      } catch (e) {
+        console.warn("Could not delete file:", file.path);
+      }
     }
 
     await tour.save();
 
-    const galleryImageUrls = tour.galleryImages.map((publicId) =>
+    const galleryUrls = tour.galleryImages.map((publicId) =>
       cloudinary.url(publicId, { secure: true })
     );
 
@@ -202,14 +198,13 @@ export const uploadMultipleFiles = async (req, res) => {
       duplicatesSkipped: skippedFiles.length,
       skippedFiles,
       galleryImages: tour.galleryImages,
-      galleryUrls: galleryImageUrls,
+      galleryUrls,
     });
   } catch (error) {
     console.error("Upload error:", error);
     res.status(500).json({ success: false, message: error.message });
   }
 };
-
 // For the non-tour version (if you want similar duplicate checking)
 export const uploadMultipleFilesNot = async (req, res) => {
   try {

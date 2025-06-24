@@ -9,3 +9,5 @@
 uploads/tours
 # Ignore logs
 uploads/profile
+# Ignore coverage reports
+tours

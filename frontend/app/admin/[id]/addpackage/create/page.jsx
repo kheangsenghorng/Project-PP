@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useTourStore } from "@/store/tourStore";
 import { useLocationStore } from "@/store/useLocationStore";
 import { useCategoryStore } from "@/store/categoryStore";
+import TourCreatorLoading from "@/components/tour-creator-loading";
 import {
   Calendar,
   Clock,
@@ -144,7 +145,7 @@ export default function CreateTourPage() {
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     if (files.length + images.length > 20) {
-      setError("Maximum 10 images allowed");
+      setError("Maximum 20 images allowed");
       return;
     }
     setImages((prev) => [...prev, ...files]);
@@ -339,6 +340,10 @@ export default function CreateTourPage() {
     }
   };
 
+  if (isLoading) {
+    return <TourCreatorLoading message="Loading your tour creator..." />;
+  }
+  
   if (isPageLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -387,12 +392,12 @@ export default function CreateTourPage() {
 
             <p className="text-sm text-gray-600 mb-4 bg-gray-100 p-3 rounded-lg border border-gray-200">
               <span className="font-medium text-gray-700">
-                Upload up to 10 high-quality images
+                Upload up to 20 high-quality images
               </span>{" "}
               that showcase your tour (required).
               <br />
               <span className="text-gray-500 text-xs">
-                Supported formats: jpeg, jpg, png, gif, webp
+                Supported formats: jpeg, jpg, png, webp
               </span>
             </p>
 
@@ -400,7 +405,7 @@ export default function CreateTourPage() {
               <Button
                 type="button"
                 onClick={handleAddClick}
-                disabled={images.length >= 10}
+                disabled={images.length >= 20}
                 variant="outline"
                 className="h-24 w-24 border-dashed border-2 flex flex-col items-center justify-center gap-1"
               >
@@ -415,7 +420,7 @@ export default function CreateTourPage() {
                 ref={fileInputRef}
                 onChange={handleImageUpload}
                 className="hidden"
-                disabled={images.length >= 10}
+                disabled={images.length >= 20}
               />
 
               {images.map((img, idx) => (
@@ -442,7 +447,7 @@ export default function CreateTourPage() {
             {images.length > 0 && (
               <p className="text-sm text-gray-500 mt-3">
                 {images.length} {images.length === 1 ? "image" : "images"}{" "}
-                selected ({10 - images.length} remaining)
+                selected ({20 - images.length} remaining)
               </p>
             )}
           </CardContent>

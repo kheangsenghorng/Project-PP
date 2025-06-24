@@ -24,12 +24,14 @@ filerouter.get("/profile/:id", verifyAdmin, getAllUsers);
 filerouter.post("/single-upload", singleUpload, handleUpqload);
 
 //upload multiple files by admin id (Protected)
+
 filerouter.post(
   "/admin/:id/upload/:tourId",
-  verifyAdmin, // Then, check if user is an admin
-  uploadMultiple,
-  uploadMultipleFiles
+  verifyAdmin, // 1. Authorization
+  uploadMultiple, // 2. Upload middleware
+  uploadMultipleFiles // 3. Final controller
 );
+
 //upload multiple files by user
 filerouter.post("/admin/:id/upload", uploadMultiple, uploadMultipleFilesNot);
 
