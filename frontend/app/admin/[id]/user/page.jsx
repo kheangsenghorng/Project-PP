@@ -284,7 +284,7 @@ const UserPage = () => {
                           <FontAwesomeIcon icon={faCopy} className="w-4 h-4" />
                         </button>
                         <Link
-                          href={`/${params.id}/edituser/${user._id}`}
+                          href={`/admin/${params.id}/edituser/${user._id}`}
                           className="p-1 hover:text-blue-500"
                           title="Edit user"
                         >

@@ -100,7 +100,7 @@ export default function TourCreatorLoading({
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8, duration: 0.6 }}
           >
-            Crafting your perfect adventure experience
+            {/* Crafting your perfect adventure experience */}
           </motion.p>
         </motion.div>
 
@@ -184,3 +184,139 @@ export default function TourCreatorLoading({
     </div>
   );
 }
+// "use client";
+
+// import { useState, useEffect } from "react";
+// import Image from "next/image";
+
+// export default function Component() {
+//   const [count, setCount] = useState(1);
+//   const [isFinished, setIsFinished] = useState(false);
+//   const [showReset, setShowReset] = useState(false);
+
+//   useEffect(() => {
+//     if (count < 100 && !isFinished) {
+//       const timer = setTimeout(() => {
+//         setCount((prev) => prev + 1);
+//       }, 50); // Adjust speed here (50ms = fast, 100ms = medium, 200ms = slow)
+
+//       return () => clearTimeout(timer);
+//     } else if (count >= 100 && !isFinished) {
+//       setTimeout(() => {
+//         setIsFinished(true);
+//         setTimeout(() => setShowReset(true), 1000);
+//       }, 500);
+//     }
+//   }, [count, isFinished]);
+
+//   const resetAnimation = () => {
+//     setCount(1);
+//     setIsFinished(false);
+//     setShowReset(false);
+//   };
+
+//   // Calculate progress for the outer ring (counterclockwise)
+//   const progress = (count / 100) * 100;
+//   const circumference = 2 * Math.PI * 45; // radius of 45
+//   const strokeDashoffset = circumference - (progress / 100) * circumference;
+
+//   return (
+//     <div className="min-h-screen bg-gray-50 flex items-center justify-center p-8">
+//       <div className="text-center">
+//         <h1 className="text-3xl font-bold text-gray-900 mb-8">
+//           Double Ring Countdown
+//         </h1>
+
+//         <div className="relative flex items-center justify-center">
+//           {/* Double Ring Container */}
+//           <div
+//             className={`relative transition-all duration-1000 ease-out ${
+//               isFinished ? "opacity-0 scale-75" : "opacity-100 scale-100"
+//             }`}
+//           >
+//             {/* Outer Progress Ring (Counterclockwise) */}
+//             <svg
+//               className="w-32 h-32 transform -rotate-90"
+//               viewBox="0 0 100 100"
+//             >
+//               {/* Background circle */}
+//               <circle
+//                 cx="50"
+//                 cy="50"
+//                 r="45"
+//                 stroke="currentColor"
+//                 strokeWidth="4"
+//                 fill="none"
+//                 className="text-gray-200"
+//               />
+//               {/* Progress circle */}
+//               <circle
+//                 cx="50"
+//                 cy="50"
+//                 r="45"
+//                 stroke="currentColor"
+//                 strokeWidth="4"
+//                 fill="none"
+//                 strokeDasharray={circumference}
+//                 strokeDashoffset={strokeDashoffset}
+//                 strokeLinecap="round"
+//                 className="text-green-500 transition-all duration-75 ease-linear"
+//                 style={{
+//                   transformOrigin: "50% 50%",
+//                   transform: "scaleY(-1)", // This makes it counterclockwise
+//                 }}
+//               />
+//             </svg>
+
+//             {/* Inner Spinning Ring */}
+//             <div className="absolute inset-0 flex items-center justify-center">
+//               <div className="w-20 h-20 border-4 border-gray-200 border-t-green-500 rounded-full animate-spin"></div>
+
+//               {/* Countdown Number */}
+//               <div className="absolute inset-0 flex items-center justify-center">
+//                 <span className="text-2xl font-bold text-green-500 tabular-nums">
+//                   {count}
+//                 </span>
+//               </div>
+//             </div>
+//           </div>
+
+//           {/* Finish Checkmark */}
+//           {/* <div
+//             className={`absolute transition-all duration-1000 ease-out ${
+//               isFinished ? "opacity-100 scale-100" : "opacity-0 scale-75"
+//             }`}
+//           >
+//             <div className="w-32 h-32 animate-pulse">
+//               <Image
+//                 src="/checkmark.png"
+//                 alt="Completion checkmark"
+//                 width={128}
+//                 height={128}
+//                 className="w-full h-full object-contain"
+//               />
+//             </div>
+//           </div> */}
+//         </div>
+
+//         {/* Reset Button */}
+//         {showReset && (
+//           <button
+//             onClick={resetAnimation}
+//             className="mt-8 px-6 py-3 bg-green-500 text-white rounded-lg hover:bg-green-600 transition-colors duration-200 font-medium"
+//           >
+//             Reset Animation
+//           </button>
+//         )}
+
+//         {/* Progress Info */}
+//         <div className="mt-6 text-sm text-gray-600">
+//           <p>Progress: {progress.toFixed(1)}%</p>
+//           <p className="mt-1">
+//             {isFinished ? "Animation Complete!" : `Counting: ${count}/100`}
+//           </p>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }

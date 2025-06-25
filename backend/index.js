@@ -16,6 +16,7 @@ import locationRoutes from "./routes/location-routes.js";
 import categoryRoutes from "./routes/category-routes.js";
 import bookingRoutes from "./routes/bookingTour-routes.js";
 import additionalInfoItemRoutes from "./routes/infoItemRoutes.js"; // Ensure this route is defined in your routes
+import tourhistoryRouter from "./routes/tourHistory-routes.js";
 
 dotenv.config();
 
@@ -43,6 +44,7 @@ app.use("/api/locations", locationRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/booking", bookingRoutes);
 app.use("/api/info-items", additionalInfoItemRoutes); // Ensure this route is defined in your routes
+app.use("/api/tour-history", tourhistoryRouter);
 
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {

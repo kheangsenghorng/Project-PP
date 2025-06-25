@@ -34,7 +34,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Skeleton } from "@/components/ui/skeleton";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -116,10 +116,16 @@ export default function TourManagement() {
   const itemsPerPage = 5;
   const totalPages = Math.ceil(sortedTours.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedTours = sortedTours.slice(
-    startIndex,
-    startIndex + itemsPerPage
-  );
+  const paginatedTours = sortedTours
+    .sort((a, b) => {
+      if (a.status === "Ongoing" && b.status !== "Ongoing") return -1;
+      if (a.status !== "Ongoing" && b.status === "Ongoing") return 1;
+      // if both same status, sort by start date
+      return new Date(a.startDate) - new Date(b.startDate);
+    })
+    .slice(startIndex, startIndex + itemsPerPage);
+
+  console.log("Filtered Tours:", paginatedTours);
 
   const handlePrevPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
@@ -316,9 +322,9 @@ export default function TourManagement() {
                   </thead>
                   <tbody>
                     {paginatedTours.length > 0 ? (
-                      paginatedTours.map((tour) => (
+                      paginatedTours.map((tour, index) => (
                         <tr
-                          key={tour._id}
+                          key={index}
                           className="border-t hover:bg-muted/30 transition-colors"
                         >
                           <td className="py-3 px-4 text-sm font-medium text-nowrap">
