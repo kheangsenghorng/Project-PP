@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { useTourStore } from "@/store/tourStore"; // Ensure you're importing the correct store
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
 const provinces = [
   "Phnom Penh",
@@ -60,6 +60,8 @@ export default function SearchTour() {
   const [error, setError] = useState(null); // 👈 added
   // Access Zustand store functions
   const { setFilterParams, fetchFilteredTours } = useTourStore();
+  const params = useParams();
+  const userId = params.id; // Assuming user ID is passed in the UR`L param
 
   const handleSearch = async () => {
     setLoading(true);
@@ -87,7 +89,12 @@ export default function SearchTour() {
       await fetchFilteredTours();
 
       // Navigate to bookings page with filters
-      router.push(`/tourpage/list-tour/?${queryParams.toString()}`);
+
+      if (!userId) {
+        router.push(`/tourpage/list-tour/?${queryParams.toString()}`);
+      } else {
+        router.push(`/tour/${userId}/list-tour/?${queryParams.toString()}`);
+      }
     } catch (err) {
       setError("Failed to fetch tours. Please try again.");
     } finally {

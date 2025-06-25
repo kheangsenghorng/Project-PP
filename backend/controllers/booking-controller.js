@@ -1,6 +1,7 @@
 import { Tourbooking } from "../models/tour-booking-models.js";
 import Tour from "../models/tour-models.js";
 import { Review } from "../models/review-models.js";
+import { createTourHistoryBooking } from "../services/TourHistorybooking.js";
 
 export const createTourBooking = async (req, res) => {
   try {
@@ -28,6 +29,16 @@ export const createTourBooking = async (req, res) => {
         } left.`,
       });
     }
+
+    // 3.5 Check if the user has create booking this tour
+    await createTourHistoryBooking({
+      tourId,
+      userId,
+      total: bookingTotal,
+      sit: bookingSit,
+      bookingDate: new Date(),
+      status: bookingStatus,
+    });
 
     // 4. Save new booking
     const newBooking = new Tourbooking({
@@ -290,9 +301,7 @@ export const getTourBookingsByUserId = async (req, res) => {
         tourBookingMap.set(tourId, {
           tourId: tour,
           galleryImages: Array.isArray(tour?.galleryImages)
-            ? tour.galleryImages.map(
-                (image) => `${baseUrl}/${image}`
-              )
+            ? tour.galleryImages.map((image) => `${baseUrl}/${image}`)
             : [],
           totalSit: booking.bookingSit,
           totalPrice: booking.bookingTotal,

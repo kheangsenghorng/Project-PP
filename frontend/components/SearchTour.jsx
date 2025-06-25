@@ -96,18 +96,18 @@ export default function SearchTour() {
     setEndDate(new Date(endParam));
   }, []); // Set state only once on mount
 
-  useEffect(() => {
-    if (!destination || !startDate || !endDate) return;
+  // useEffect(() => {
+  //   if (!destination || !startDate || !endDate) return;
 
-    const runSearchAndCleanURL = async () => {
-      await handleSearch(); // wait for search
+  //   const runSearchAndCleanURL = async () => {
+  //     await handleSearch(); // wait for search
 
-      // Replace current URL with clean version (no query string)
-      router.replace("/tourpage/list-tour");
-    };
+  //     // Replace current URL with clean version (no query string)
+  //     router.replace("/tourpage/list-tour");
+  //   };
 
-    runSearchAndCleanURL();
-  }, [destination, startDate, endDate]);
+  //   runSearchAndCleanURL();
+  // }, [destination, startDate, endDate]);
 
   return (
     <div className="mx-auto my-5 flex h-[100px] w-full max-w-[1000px] items-center justify-between rounded-full border bg-white p-6 shadow-md">

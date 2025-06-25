@@ -79,6 +79,7 @@ export default function EditTourPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isPageLoading, setIsPageLoading] = useState(true);
+  const [count, setCount] = useState(1);
   const [itineraryList, setItineraryList] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState({
     start_location: false,
@@ -308,6 +309,46 @@ export default function EditTourPage() {
     return true;
   };
 
+  // const handleSubmit = async (e) => {
+  //   e.preventDefault();
+  //   setError(null);
+
+  //   if (!validateForm()) return;
+
+  //   setIsLoading(true);
+  //   setIsDone(false); // Reset isDone state
+
+  //   try {
+  //     // Upload new images first
+  //     if (newImages.length > 0) {
+  //       const imageFormData = new FormData();
+  //       newImages.forEach((image) => imageFormData.append("files", image));
+  //       await uploadFiles(params.id, params.tourId, imageFormData);
+  //     }
+
+  //     // Prepare tour data
+  //     const tourData = {
+  //       ...formState,
+  //       start_location: locationIds.start_location || tour?.start_location?._id,
+  //       first_destination:
+  //         locationIds.first_destination || tour?.first_destination?._id,
+  //       second_destination:
+  //         locationIds.second_destination || tour?.second_destination?._id,
+  //       category: categoryId || tour?.category?._id,
+  //       itineraries: itineraryList,
+  //     };
+
+  //     await updateTour(params.tourId, tourData);
+  //     setIsDone(true); // ✅ Mark as done
+  //     // setCount(1);
+  //   } catch (err) {
+  //     console.error("Error updating tour:", err);
+  //     setError(err.message || "Failed to update tour");
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
@@ -315,16 +356,15 @@ export default function EditTourPage() {
     if (!validateForm()) return;
 
     setIsLoading(true);
-
+    setIsDone(false);
+    setCount(1);
     try {
-      // Upload new images first
       if (newImages.length > 0) {
         const imageFormData = new FormData();
         newImages.forEach((image) => imageFormData.append("files", image));
         await uploadFiles(params.id, params.tourId, imageFormData);
       }
 
-      // Prepare tour data
       const tourData = {
         ...formState,
         start_location: locationIds.start_location || tour?.start_location?._id,
@@ -337,12 +377,15 @@ export default function EditTourPage() {
       };
 
       await updateTour(params.tourId, tourData);
+
+      // ✅ This triggers the animation flow
+      setIsDone(true);
       router.push(`/admin/${params.id}/addpackage`);
     } catch (err) {
       console.error("Error updating tour:", err);
       setError(err.message || "Failed to update tour");
     } finally {
-      setIsLoading(false);
+      setIsLoading(false); // Only hide loading spinner, not animation
     }
   };
 
@@ -397,12 +440,10 @@ export default function EditTourPage() {
     }
   }, [itineraries]);
 
-
+  // Show loading animation when processing
   if (isLoading && !isDone) {
     return <TourCreatorLoading message="Updating your adventure..." />;
   }
-
-
   if (isPageLoading) {
     return (
       <div className="flex justify-center items-center h-screen">

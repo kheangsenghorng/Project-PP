@@ -280,6 +280,10 @@ export default function CreateTourPage() {
 
     return true;
   };
+  
+  if (isLoading) {
+    return <TourCreatorLoading message="Loading your tour creator..." />;
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -340,10 +344,6 @@ export default function CreateTourPage() {
     }
   };
 
-  if (isLoading) {
-    return <TourCreatorLoading message="Loading your tour creator..." />;
-  }
-  
   if (isPageLoading) {
     return (
       <div className="flex justify-center items-center h-screen">

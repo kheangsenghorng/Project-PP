@@ -11,118 +11,6 @@ import Location from "../models/loaction-models.js";
 import { Category } from "../models/category-models.js";
 import { Tourbooking } from "../models/tour-booking-models.js";
 
-// Create a new tour
-// export const createTour = async (req, res) => {
-//   try {
-//     const {
-//       tour_name,
-//       description,
-//       price,
-//       start_location,
-//       first_destination,
-//       second_destination,
-//       startDate,
-//       endDate,
-//       status,
-//       overview,
-//       category,
-//       limit,
-//       itineraries,
-//     } = req.body;
-
-//     // ✅ Upload images using helper
-//     const { success, uploadedFiles, message } = await uploadTourImages(req);
-//     if (!success) {
-//       return res.status(400).json({ success: false, message });
-//     }
-
-//     // Auto-generate tour_id with prefix "TTHH"
-//     const lastTour = await Tour.findOne({ tour_id: { $regex: /^TTHH\d+$/ } })
-//       .sort({ tour_id: -1 })
-//       .select("tour_id");
-
-//     let newNumericId = 1;
-
-//     if (lastTour && lastTour.tour_id) {
-//       const match = lastTour.tour_id.match(/^TTHH(\d+)$/);
-//       if (match && match[1]) {
-//         newNumericId = parseInt(match[1]) + 1;
-//       }
-//     }
-
-//     const tour_id = `TTHH${newNumericId}`;
-
-//     // Find an admin user
-//     const admin = await User.findOne({ role: "admin" });
-//     if (!admin) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Admin not found. Cannot create a tour without an admin.",
-//       });
-//     }
-
-//     // Validate start location
-//     const startLocation = await Location.findById(start_location);
-//     if (!startLocation) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Start location not found",
-//       });
-//     }
-
-//     const categories = await Category.findById(category);
-//     if (!categories) {
-//       return res.status(404).json({
-//         success: false,
-//         message: "Category not found",
-//       });
-//     }
-
-//     // Create new tour
-//     const newTour = new Tour({
-//       tour_id,
-//       tour_name,
-//       description,
-//       price,
-//       start_location,
-//       first_destination,
-//       second_destination,
-//       startDate,
-//       endDate,
-//       status,
-//       overview,
-//       category,
-//       limit,
-//       galleryImages: uploadedFiles,
-//       admin: admin._id,
-//     });
-
-//     await newTour.save();
-
-//     // Handle itineraries
-//     let parsedItineraries = [];
-//     if (typeof itineraries === "string") {
-//       parsedItineraries = JSON.parse(itineraries);
-//     } else {
-//       parsedItineraries = itineraries;
-//     }
-
-//     if (Array.isArray(parsedItineraries) && parsedItineraries.length > 0) {
-//       for (const itinerary of parsedItineraries) {
-//         await createItineraryEntry({ ...itinerary, tour: newTour._id });
-//       }
-//     }
-
-//     res.status(201).json({
-//       success: true,
-//       message: "Tour created successfully",
-//       tour: newTour,
-//     });
-//   } catch (error) {
-//     res.status(500).json({ success: false, message: error.message });
-//   }
-// };
-
 export const createTour = async (req, res) => {
   try {
     const {
@@ -147,19 +35,40 @@ export const createTour = async (req, res) => {
       return res.status(400).json({ success: false, message });
     }
 
-    // 2. Auto-generate tour_id with format TTHH<number>
-    const lastTour = await Tour.findOne({ tour_id: { $regex: /^TTHH\d+$/ } })
+    // // 2. Auto-generate tour_id with format TTHH<number>
+    // const lastTour = await Tour.findOne({ tour_id: { $regex: /^TTHH\d+$/ } })
+    //   .sort({ tour_id: -1 })
+    //   .select("tour_id");
+
+    // let newNumericId = 1;
+    // if (lastTour?.tour_id) {
+    //   const match = lastTour.tour_id.match(/^TTHH(\d+)$/);
+    //   if (match?.[1]) {
+    //     newNumericId = parseInt(match[1], 10) + 1;
+    //   }
+    // }
+    // const tour_id = `TTHH${newNumericId}`;
+    const currentYear = new Date().getFullYear();
+
+    // Find the last tour ID that matches the format "BK-<YEAR>-<4_DIGITS>"
+    const lastTour = await Tour.findOne({
+      tour_id: { $regex: `^T-${currentYear}-\\d{4}$` },
+    })
       .sort({ tour_id: -1 })
       .select("tour_id");
 
     let newNumericId = 1;
+
     if (lastTour?.tour_id) {
-      const match = lastTour.tour_id.match(/^TTHH(\d+)$/);
+      const match = lastTour.tour_id.match(/^T-\d{4}-(\d{4})$/);
       if (match?.[1]) {
         newNumericId = parseInt(match[1], 10) + 1;
       }
     }
-    const tour_id = `TTHH${newNumericId}`;
+
+    // Pad the number with leading zeros to always have 4 digits
+    const paddedId = String(newNumericId).padStart(4, "0");
+    const tour_id = `T-${currentYear}-${paddedId}`;
 
     // 3. Find admin user (assumed only one admin)
     const admin = await User.findOne({ role: "admin" });
@@ -238,69 +147,8 @@ export const createTour = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
 // Display all tours
-// export const getAllTours = async (req, res) => {
-//   try {
-//     const now = new Date();
-
-//     // Check if current time is exactly 00:00:00
-
-//     const result = await Tour.updateMany(
-//       {
-//         startDate: { $lte: now },
-//         status: { $nin: ["Close", "Full"] },
-//       },
-//       { $set: { status: "Close" } }
-//     );
-
-//     const baseUrl =
-//       process.env.BASE_URL || `${req.protocol}://${req.get("host")}`;
-
-//     // Step 2: Fetch all tours with populated fields
-//     const tours = await Tour.find()
-//       .populate("admin", "name email")
-//       .populate("start_location")
-//       .populate("first_destination")
-//       .populate("second_destination")
-//       .populate("category");
-
-//     // Step 3: Enhance each tour with image URLs and review stats
-//     const updatedTours = await Promise.all(
-//       tours.map(async (tour) => {
-//         const reviews = await Review.find({ tourId: tour._id });
-
-//         const averageRating =
-//           reviews.length > 0
-//             ? reviews.reduce((sum, review) => sum + review.rating, 0) /
-//               reviews.length
-//             : 0;
-
-//         return {
-//           ...tour.toObject(),
-//           galleryImages: tour.galleryImages.map(
-//             (image) => `${baseUrl}/uploads/tours/${image}`
-//           ),
-//           averageRating: parseFloat(averageRating.toFixed(1)),
-//           totalReviews: reviews.length,
-//         };
-//       })
-//     );
-
-//     // Step 4: Send response
-//     res.status(200).json({
-//       success: true,
-//       updatedStatusCount: result.modifiedCount,
-//       count: updatedTours.length,
-//       tours: updatedTours,
-//     });
-//   } catch (error) {
-//     console.error("❌ Error in getAllTours:", error);
-//     res.status(500).json({
-//       success: false,
-//       message: error.message,
-//     });
-//   }
-// };
 
 export const getAllTours = async (req, res) => {
   try {

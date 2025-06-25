@@ -198,7 +198,7 @@ export default function AdminDashboard() {
           <tbody>
             {bookingTour.map((booking, i) => (
               <tr key={i} className="border-t">
-               <td className="px-4 py-3">{booking?.tourId?.tour_id.slice(-6)}</td>
+                <td className="px-4 py-3">{booking?.tourId?.tour_id}</td>
                 <td className="px-4 py-3">
                   {booking?.userId?.firstname} {booking?.userId?.lastname}
                 </td>
