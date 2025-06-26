@@ -12,7 +12,7 @@ export function PaymentDetails({ payment }) {
           <div className="space-y-2">
             <div className="flex justify-between items-center">
               <span className="text-muted-foreground">Payment ID:</span>
-              <span className="font-medium">{payment.id}</span>
+              <span className="font-medium">{payment?.bookingId}</span>
             </div>
 
             <Separator />
@@ -22,7 +22,7 @@ export function PaymentDetails({ payment }) {
                 <Calendar className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Date & Time:</span>
               </div>
-              <span className="font-medium">{format(payment.date, "PPP p")}</span>
+              <span className="font-medium">{format(payment.bookingDate, "PPP p")}</span>
             </div>
 
             <div className="flex justify-between items-center">
@@ -30,7 +30,7 @@ export function PaymentDetails({ payment }) {
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Amount:</span>
               </div>
-              <span className="font-medium">${payment.amount.toFixed(2)}</span>
+              <span className="font-medium">${payment.total.toFixed(2)}</span>
             </div>
 
             <div className="flex justify-between items-center">
@@ -52,7 +52,7 @@ export function PaymentDetails({ payment }) {
                 <Package className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Tour Package:</span>
               </div>
-              <span className="font-medium">{payment.package}</span>
+              <span className="font-medium">{payment?.tourId?.tour_name}</span>
             </div>
 
             <div className="flex justify-between items-center">
@@ -60,7 +60,7 @@ export function PaymentDetails({ payment }) {
                 <Users className="h-4 w-4 text-muted-foreground" />
                 <span className="text-muted-foreground">Number of Guests:</span>
               </div>
-              <span className="font-medium">{payment.guests}</span>
+              <span className="font-medium">{payment?.sit}</span>
             </div>
           </div>
         </CardContent>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   CreditCard,
   Building,
@@ -28,6 +28,8 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { PaymentDetails } from "@/components/PaymentDetails";
+import { useTourHistoryStore } from "@/store/useTourHistoryStore";
+import { useParams } from "next/navigation";
 
 // Sample payment history data
 
@@ -83,6 +85,21 @@ const PaymentHistoryTable = () => {
   const [sortField, setSortField] = useState("date");
   const [sortDirection, setSortDirection] = useState("desc");
   const [selectedPayment, setSelectedPayment] = useState(null);
+  const params = useParams();
+  const {
+    bookings,
+    fetchBookings,
+    isLoading,
+    error: historyError,
+  } = useTourHistoryStore();
+
+  useEffect(() => {
+    if (params.id) {
+      fetchBookings(params.id);
+    }
+  }, [params.id]);
+
+  console.log("Payment History Data:", bookings);
 
   const handleSort = (field) => {
     if (sortField === field) {
@@ -93,25 +110,25 @@ const PaymentHistoryTable = () => {
     }
   };
 
-  const sortedData = [...paymentHistoryData].sort((a, b) => {
-    if (sortField === "date") {
-      return sortDirection === "asc"
-        ? a.date.getTime() - b.date.getTime()
-        : b.date.getTime() - a.date.getTime();
-    } else if (sortField === "amount") {
-      return sortDirection === "asc"
-        ? a.amount - b.amount
-        : b.amount - a.amount;
-    } else if (sortField === "guests") {
-      return sortDirection === "asc"
-        ? a.guests - b.guests
-        : b.guests - a.guests;
-    } else {
-      return sortDirection === "asc"
-        ? a[sortField].localeCompare(b[sortField])
-        : b[sortField].localeCompare(a[sortField]);
-    }
-  });
+  // const sortedData = [...paymentHistoryData].sort((a, b) => {
+  //   if (sortField === "date") {
+  //     return sortDirection === "asc"
+  //       ? a.date.getTime() - b.date.getTime()
+  //       : b.date.getTime() - a.date.getTime();
+  //   } else if (sortField === "amount") {
+  //     return sortDirection === "asc"
+  //       ? a.amount - b.amount
+  //       : b.amount - a.amount;
+  //   } else if (sortField === "guests") {
+  //     return sortDirection === "asc"
+  //       ? a.guests - b.guests
+  //       : b.guests - a.guests;
+  //   } else {
+  //     return sortDirection === "asc"
+  //       ? a[sortField].localeCompare(b[sortField])
+  //       : b[sortField].localeCompare(a[sortField]);
+  //   }
+  // });
 
   return (
     <div className="rounded-md border">
@@ -160,7 +177,7 @@ const PaymentHistoryTable = () => {
                   <ChevronDown className="inline ml-1 h-4 w-4" />
                 ))}
             </TableHead>
-            <TableHead
+            {/* <TableHead
               className="cursor-pointer"
               onClick={() => handleSort("method")}
             >
@@ -171,7 +188,7 @@ const PaymentHistoryTable = () => {
                 ) : (
                   <ChevronDown className="inline ml-1 h-4 w-4" />
                 ))}
-            </TableHead>
+            </TableHead> */}
             <TableHead
               className="cursor-pointer"
               onClick={() => handleSort("package")}
@@ -200,11 +217,13 @@ const PaymentHistoryTable = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sortedData.map((payment) => (
-            <TableRow key={payment.id}>
-              <TableCell className="font-medium">{payment.id}</TableCell>
-              <TableCell>{format(payment.date, "PPP p")}</TableCell>
-              <TableCell>${payment.amount.toFixed(2)}</TableCell>
+          {bookings.map((payment, index) => (
+            <TableRow key={index}>
+              <TableCell className="font-medium">
+                {payment?.bookingId}
+              </TableCell>
+              <TableCell>{format(payment.bookingDate, "PPP p")}</TableCell>
+              <TableCell>${payment.total.toFixed(2)}</TableCell>
               <TableCell>
                 {payment.method === "visa" ? (
                   <Badge
@@ -224,8 +243,8 @@ const PaymentHistoryTable = () => {
                   </Badge>
                 )}
               </TableCell>
-              <TableCell>{payment.package}</TableCell>
-              <TableCell>{payment.guests}</TableCell>
+              <TableCell>{payment?.tourId?.tour_name || "N/A"}</TableCell>
+              <TableCell>{payment?.sit}</TableCell>
               <TableCell>
                 <Dialog>
                   <DialogTrigger asChild>
