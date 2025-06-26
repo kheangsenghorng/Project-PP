@@ -65,7 +65,7 @@ export const useBookingStore = create((set) => ({
         loading: false,
       });
     } catch (error) {
-      console.error("Fetch bookings failed:", error);
+      // console.error("Fetch bookings failed:", error);
 
       set({
         bookings: [],

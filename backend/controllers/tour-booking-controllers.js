@@ -10,6 +10,7 @@ import { createItineraryEntry } from "../services/itineraryService.js";
 import Location from "../models/loaction-models.js";
 import { Category } from "../models/category-models.js";
 import { Tourbooking } from "../models/tour-booking-models.js";
+import { deleteBookingsByTourId } from "../services/deleteBookingsByTourId.js";
 
 export const createTour = async (req, res) => {
   try {
@@ -574,6 +575,136 @@ export const checkTourId = async (req, res) => {
   }
 };
 
+// export const updateTour = async (req, res) => {
+//   const { tourId } = req.params;
+
+//   try {
+//     const {
+//       tour_name,
+//       description,
+//       price,
+//       start_location,
+//       first_destination,
+//       second_destination,
+//       startDate,
+//       endDate,
+//       status,
+//       overview,
+//       category, // category name or slug
+//       limit,
+//       itineraries,
+//     } = req.body;
+
+//     const existingTour = await Tour.findById(tourId);
+//     if (!existingTour) {
+//       return res
+//         .status(404)
+//         .json({ success: false, message: "Tour not found" });
+//     }
+
+//     // Step 1: Collect only non-empty location inputs
+//     const locationInputs = [
+//       start_location,
+//       first_destination,
+//       second_destination,
+//     ].filter(Boolean);
+
+//     // Step 2: Fetch matching locations from DB
+//     const foundLocations = await Location.find({
+//       $or: [
+//         { name: { $in: locationInputs } },
+//         {
+//           _id: {
+//             $in: locationInputs.filter((val) => /^[a-f\d]{24}$/i.test(val)),
+//           },
+//         },
+//       ],
+//     });
+
+//     // Step 3: Create a lookup map
+//     const locationMap = {};
+//     foundLocations.forEach((loc) => {
+//       locationMap[loc._id.toString()] = loc._id;
+//       locationMap[loc.name] = loc._id;
+//     });
+
+//     // ✅ Resolve category ID by name or slug
+//     let categoryId = existingTour.category;
+//     if (category) {
+//       const foundCategory = await Category.findOne({
+//         $or: [{ name: category }, { slug: category }],
+//       });
+//       if (foundCategory) {
+//         categoryId = foundCategory._id;
+//       }
+//     }
+
+//     // ✅ Update tour fields
+//     if (tour_name !== undefined) existingTour.tour_name = tour_name;
+//     if (description !== undefined) existingTour.description = description;
+//     if (price !== undefined) existingTour.price = price;
+
+//     // Step 4: Conditionally update fields
+//     if (start_location) {
+//       existingTour.start_location =
+//         locationMap[start_location] || start_location;
+//     }
+
+//     if (first_destination) {
+//       existingTour.first_destination =
+//         locationMap[first_destination] || first_destination;
+//     }
+
+//     if (second_destination) {
+//       existingTour.second_destination =
+//         locationMap[second_destination] || second_destination;
+//     }
+
+//     if (startDate !== undefined) existingTour.startDate = startDate;
+//     if (endDate !== undefined) existingTour.endDate = endDate;
+//     if (status !== undefined) existingTour.status = status;
+//     if (overview !== undefined) existingTour.overview = overview;
+//     if (limit !== undefined) existingTour.limit = limit;
+//     if (categoryId) existingTour.category = categoryId;
+
+//     await existingTour.save();
+
+//     // ✅ Update itineraries if provided
+//     let parsedItineraries = [];
+//     if (itineraries) {
+//       parsedItineraries =
+//         typeof itineraries === "string" ? JSON.parse(itineraries) : itineraries;
+
+//       if (Array.isArray(parsedItineraries) && parsedItineraries.length > 0) {
+//         await Itinerary.deleteMany({ tour: existingTour._id });
+//         for (const itinerary of parsedItineraries) {
+//           await createItineraryEntry({ ...itinerary, tour: existingTour._id });
+//         }
+//       }
+//     }
+
+//     const populatedTour = await Tour.findById(existingTour._id)
+//       .populate("start_location", "name")
+//       .populate("first_destination", "name")
+//       .populate("second_destination", "name")
+//       .populate("category", "name slug");
+
+//     const updatedItineraries = await Itinerary.find({ tour: existingTour._id });
+
+//     await updateBooking(tourId, updateData);
+
+//     res.status(200).json({
+//       success: true,
+//       message: "Tour updated successfully",
+//       tour: populatedTour,
+//       parsedItinerarie: updatedItineraries,
+//     });
+//   } catch (error) {
+//     console.error("Update Tour Error:", error);
+//     res.status(500).json({ success: false, message: error.message });
+//   }
+// };
+
 export const updateTour = async (req, res) => {
   const { tourId } = req.params;
 
@@ -589,7 +720,7 @@ export const updateTour = async (req, res) => {
       endDate,
       status,
       overview,
-      category, // category name or slug
+      category,
       limit,
       itineraries,
     } = req.body;
@@ -601,14 +732,19 @@ export const updateTour = async (req, res) => {
         .json({ success: false, message: "Tour not found" });
     }
 
-    // Step 1: Collect only non-empty location inputs
+    const startDateChanged =
+      startDate && startDate !== existingTour.startDate?.toISOString();
+    const statusWasClosedOrFull = ["Close", "Full"].includes(
+      existingTour.status
+    );
+    const statusChangedTo = status;
+
+    // Step 1: Resolve location IDs
     const locationInputs = [
       start_location,
       first_destination,
       second_destination,
     ].filter(Boolean);
-
-    // Step 2: Fetch matching locations from DB
     const foundLocations = await Location.find({
       $or: [
         { name: { $in: locationInputs } },
@@ -620,45 +756,34 @@ export const updateTour = async (req, res) => {
       ],
     });
 
-    // Step 3: Create a lookup map
     const locationMap = {};
     foundLocations.forEach((loc) => {
       locationMap[loc._id.toString()] = loc._id;
       locationMap[loc.name] = loc._id;
     });
 
-    // ✅ Resolve category ID by name or slug
+    // Step 2: Resolve category
     let categoryId = existingTour.category;
     if (category) {
       const foundCategory = await Category.findOne({
         $or: [{ name: category }, { slug: category }],
       });
-      if (foundCategory) {
-        categoryId = foundCategory._id;
-      }
+      if (foundCategory) categoryId = foundCategory._id;
     }
 
-    // ✅ Update tour fields
+    // Step 3: Update tour fields
     if (tour_name !== undefined) existingTour.tour_name = tour_name;
     if (description !== undefined) existingTour.description = description;
     if (price !== undefined) existingTour.price = price;
-
-    // Step 4: Conditionally update fields
-    if (start_location) {
+    if (start_location)
       existingTour.start_location =
         locationMap[start_location] || start_location;
-    }
-
-    if (first_destination) {
+    if (first_destination)
       existingTour.first_destination =
         locationMap[first_destination] || first_destination;
-    }
-
-    if (second_destination) {
+    if (second_destination)
       existingTour.second_destination =
         locationMap[second_destination] || second_destination;
-    }
-
     if (startDate !== undefined) existingTour.startDate = startDate;
     if (endDate !== undefined) existingTour.endDate = endDate;
     if (status !== undefined) existingTour.status = status;
@@ -668,7 +793,16 @@ export const updateTour = async (req, res) => {
 
     await existingTour.save();
 
-    // ✅ Update itineraries if provided
+    // Step 4: Update related bookings if tour changed from Close/Full and startDate updated
+    if (
+      startDateChanged &&
+      statusWasClosedOrFull &&
+      statusChangedTo === "Ongoing"
+    ) {
+      await deleteBookingsByTourId(tourId);
+    }
+
+    // Step 5: Update itineraries
     let parsedItineraries = [];
     if (itineraries) {
       parsedItineraries =
@@ -682,6 +816,7 @@ export const updateTour = async (req, res) => {
       }
     }
 
+    // Step 6: Populate and respond
     const populatedTour = await Tour.findById(existingTour._id)
       .populate("start_location", "name")
       .populate("first_destination", "name")

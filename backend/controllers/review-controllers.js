@@ -1,5 +1,6 @@
 import { Review } from "../models/review-models.js";
 import Tour from "../models/tour-models.js";
+import { TourHistorybooking } from "../models/tour-history_bookings.js";
 import { User } from "../models/user-models.js";
 
 // Create a new review
@@ -15,7 +16,7 @@ export const createReview = async (req, res) => {
     }
 
     // Check if the tourId and userId are valid
-    const tour = await Tour.findById(tourId);
+    const tour = await TourHistorybooking.findOne({ tourId });
     if (!tour) {
       return res
         .status(404)
@@ -49,28 +50,20 @@ export const createReview = async (req, res) => {
 // Get all reviews for a specific tour, calculate the average rating, count the ratings, and check tour status
 export const getReviewsByTourId = async (req, res) => {
   try {
-    const { tourId } = req.params; // Extract tourId from URL params
+    const { tourId } = req.params;
 
-    // Find the tour by ID to check its status and limit
-    const tour = await Tour.findById(tourId);
-    if (!tour) {
+    // Find booking that includes tour data
+    const booking = await TourHistorybooking.findOne({ tourId }).populate(
+      "tourId"
+    );
+
+    if (!booking || !booking.tourId) {
       return res.status(404).json({ message: "Tour not found" });
     }
 
-    // Define the maximum number of reviews allowed
-    // const reviewLimit = tour.limit;
+    const tour = booking.tourId;
 
-    // // Count the current number of reviews for this tour
-    // const reviewCount = await Review.countDocuments({ tourId });
-
-    // // // Check if the review count has reached the limit
-    // if (reviewCount >= reviewLimit && tour.status !== "Full") {
-    //   // Update the status of the tour to "Full"
-    //   tour.status = "Full";
-    //   await tour.save(); // Save the updated tour status
-    // }
-
-    // Find all reviews for the given tourId
+    // Get all reviews for the tour
     const reviews = await Review.find({ tourId }).populate("userId");
 
     if (!reviews || reviews.length === 0) {
@@ -79,58 +72,56 @@ export const getReviewsByTourId = async (req, res) => {
         .json({ message: "No reviews found for this tour" });
     }
 
-    // Calculate the average rating for the tour
+    // Calculate average rating
     const averageRating =
-      reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
+      reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length;
 
-    // Count how many reviews for each rating (e.g., 5 stars, 4 stars, etc.)
-    const ratingCounts = reviews.reduce((acc, review) => {
-      acc[review.rating] = (acc[review.rating] || 0) + 1;
-      return acc;
+    // Count how many reviews for each rating level
+    const ratingCounts = reviews.reduce((counts, r) => {
+      counts[r.rating] = (counts[r.rating] || 0) + 1;
+      return counts;
     }, {});
 
     const lengthuserRating = reviews.length;
 
-    // Base URL for generating the full image path
+    // Base URL for generating full image path
     const baseUrl =
       process.env.BASE_URL || `${req.protocol}://${req.get("host")}`;
 
-    // Map through each review to include copiedTour and copiedUser data
     const responseReviews = await Promise.all(
       reviews.map(async (review) => {
-        // Fetch the associated user
-        const user = await User.findById(review.userId);
+        const user = review.userId;
 
         const copiedTour = {
           ...tour.toObject(),
-          galleryImages: tour.galleryImages.map(
-            (image) => `${baseUrl}/${image}`
-          ),
+          galleryImages:
+            tour.galleryImages?.map((img) => `${baseUrl}/${img}`) || [],
         };
 
-        // Create copiedUser with updated image URLs
         const copiedUser = {
           ...user.toObject(),
-          profile_image: `${baseUrl}/${user.profile_image}`,
+          profile_image: user.profile_image
+            ? `${baseUrl}/${user.profile_image}`
+            : null,
         };
 
         return {
           ...review.toObject(),
-          copiedUser,
           copiedTour,
+          copiedUser,
         };
       })
     );
 
-    // Return the reviews with the average rating, rating counts, and tour status
-    res.status(200).json({
+    return res.status(200).json({
       averageRating,
       ratingCounts,
-      lengthuserRating, // Add the rating count in the response
+      lengthuserRating,
       reviews: responseReviews,
     });
   } catch (error) {
-    res.status(500).json({ message: "Error fetching reviews", error });
+    console.error("Error fetching reviews:", error);
+    return res.status(500).json({ message: "Error fetching reviews", error });
   }
 };
 
@@ -220,8 +211,7 @@ export const getAllReviews = async (req, res) => {
       if (!reviewsMap[tid]) {
         // Update gallery image URLs here
         const updatedGalleryImages =
-          tour.galleryImages?.map((img) => `${baseUrl}/${img}`) ||
-          [];
+          tour.galleryImages?.map((img) => `${baseUrl}/${img}`) || [];
 
         reviewsMap[tid] = {
           tour: {

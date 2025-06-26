@@ -24,6 +24,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useTourHistoryStore } from "@/store/useTourHistoryStore";
 import { getCloudinaryUrl } from "@/utils/cloudinary";
 
 export default function Edituser() {
@@ -37,6 +38,13 @@ export default function Edituser() {
     fetchProfileImage,
     uploadProfileImage,
   } = profileStore();
+
+  const {
+    bookings,
+    fetchBookings,
+    isLoading,
+    error: historyError,
+  } = useTourHistoryStore();
 
   const {
     address,
@@ -103,6 +111,20 @@ export default function Edituser() {
     }
   }, [params.userId, fetchUserByIdadmin, fetchProfileImage, fetchAddress]);
 
+  useEffect(() => {
+    if (params.userId) {
+      fetchBookings(params.userId);
+    }
+  }, [params.userId]);
+
+  // console.log("Bookings:", bookings);
+
+  const totallength = bookings?.length;
+  const tatalamount = bookings?.reduce(
+    (total, booking) => total + (booking.total || 0),
+    0
+  );
+
   // Handle select changes
   const handleAddressChange = (e) => {
     setFormAddress({ ...formAddress, [e.target.name]: e.target.value });
@@ -134,6 +156,9 @@ export default function Edituser() {
     }
   };
 
+  // if (isLoading) return <p>Loading...</p>;
+  // if (historyError) return <p className="text-red-500">{error}</p>;
+
   return (
     <div className="container mx-auto py-10 px-4 md:px-6">
       <ToastContainer
@@ -153,7 +178,7 @@ export default function Edituser() {
           <Card>
             <CardContent className="pt-6">
               <div className="flex flex-col items-center space-y-4">
-                <p>{user?.status}</p>
+                {/* <p>{user?.status}</p> */}
                 <Avatar className="h-24 w-24">
                   <Image
                     src={
@@ -170,21 +195,21 @@ export default function Edituser() {
                     {formData.firstname || "Unknown"}
                     {formData.lastname ? ` ${formData.lastname}` : ""}
                   </h2>
-                  <p className="text-muted-foreground flex items-center justify-center gap-1">
+                  {/* <p className="text-muted-foreground flex items-center justify-center gap-1">
                     <MapPin className="h-4 w-4" />
                     {formAddress.country || "Country"}
                     {formAddress.city ? `, ${formAddress.city}` : ""}
-                  </p>
+                  </p> */}
                 </div>
 
                 <div className="flex w-full justify-around text-center">
                   <div>
-                    <p className="text-xl font-bold">12</p>
+                    <p className="text-xl font-bold">{totallength}</p>
                     <p className="text-xs text-muted-foreground">Tours</p>
                   </div>
                   <div>
-                    <p className="text-xl font-bold">4</p>
-                    <p className="text-xs text-muted-foreground">Countries</p>
+                    <p className="text-xl font-bold">${tatalamount}</p>
+                    <p className="text-xs text-muted-foreground">Amount</p>
                   </div>
                   <div>
                     <p className="text-xl font-bold">3</p>
@@ -367,115 +392,60 @@ export default function Edituser() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-6">
-                    {/* Upcoming Tour */}
-                    <div className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-semibold text-lg">
-                            Bali Paradise Exploration
-                          </h3>
-                          <p className="text-muted-foreground">
-                            Booking ID: BK-2023-8754
-                          </p>
+                    {bookings.map((booking, index) => (
+                      <div key={index} className="border rounded-lg p-4">
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <h3 className="font-semibold text-lg">
+                              {booking.tourId?.tour_name || "Tour Booking"}
+                            </h3>
+                            <p className="text-muted-foreground">
+                              Booking ID: {booking.bookingId || "N/A"}
+                            </p>
+                          </div>
+                          {/* <Badge className="bg-blue-500">Upcoming</Badge> */}
                         </div>
-                        <Badge className="bg-blue-500">Upcoming</Badge>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                        <div>
-                          <h4 className="text-sm font-medium text-muted-foreground">
-                            Dates
-                          </h4>
-                          <p>Jun 15, 2024 - Jun 25, 2024</p>
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium text-muted-foreground">
-                            Guests
-                          </h4>
-                          <p>2 Adults</p>
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium text-muted-foreground">
-                            Total
-                          </h4>
-                          <p>$2,450</p>
-                        </div>
-                      </div>
-                    </div>
 
-                    {/* Completed Tour */}
-                    <div className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-semibold text-lg">
-                            European Heritage Tour
-                          </h3>
-                          <p className="text-muted-foreground">
-                            Booking ID: BK-2023-6542
-                          </p>
-                        </div>
-                        <Badge className="bg-green-500">Completed</Badge>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                        <div>
-                          <h4 className="text-sm font-medium text-muted-foreground">
-                            Dates
-                          </h4>
-                          <p>Sep 10, 2023 - Sep 24, 2023</p>
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium text-muted-foreground">
-                            Guests
-                          </h4>
-                          <p>2 Adults, 1 Child</p>
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium text-muted-foreground">
-                            Total
-                          </h4>
-                          <p>$4,850</p>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Cancelled Tour */}
-                    <div className="border rounded-lg p-4">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h3 className="font-semibold text-lg">
-                            African Safari Adventure
-                          </h3>
-                          <p className="text-muted-foreground">
-                            Booking ID: BK-2022-9876
-                          </p>
-                        </div>
-                        <Badge
-                          variant="outline"
-                          className="text-red-500 border-red-500"
-                        >
-                          Cancelled
-                        </Badge>
-                      </div>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                        <div>
-                          <h4 className="text-sm font-medium text-muted-foreground">
-                            Dates
-                          </h4>
-                          <p>Mar 5, 2023 - Mar 15, 2023</p>
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium text-muted-foreground">
-                            Guests
-                          </h4>
-                          <p>2 Adults</p>
-                        </div>
-                        <div>
-                          <h4 className="text-sm font-medium text-muted-foreground">
-                            Refund
-                          </h4>
-                          <p>$3,200 (80%)</p>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+                          <div>
+                            <h4 className="text-sm font-medium text-muted-foreground">
+                              Dates
+                            </h4>
+                            <p>
+                              {new Date(booking?.date?.[0]).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "2-digit",
+                                  year: "numeric",
+                                }
+                              )}
+                              {" - "}
+                              {new Date(booking?.date?.[1]).toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "short",
+                                  day: "2-digit",
+                                  year: "numeric",
+                                }
+                              )}
+                            </p>
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-medium text-muted-foreground">
+                              Seat
+                            </h4>
+                            <p>{booking?.sit}</p>
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-medium text-muted-foreground">
+                              Total
+                            </h4>
+                            <p>${booking?.total}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    ))}
                   </div>
                 </CardContent>
               </Card>

@@ -12,8 +12,13 @@ import { useBookingStore } from "../store/useBookingStore";
 export default function UpcomingTours() {
   const { id } = useParams();
 
-  const { bookings, fetchBookingsByUserId, fetchBookingsByUser } =
-    useBookingStore();
+  const {
+    bookings,
+    fetchBookingsByUserId,
+    fetchBookingsByUser,
+    loading,
+    error,
+  } = useBookingStore();
 
   useEffect(() => {
     if (id) {
@@ -54,6 +59,14 @@ export default function UpcomingTours() {
     today.setHours(0, 0, 0, 0);
     return endDate >= today;
   });
+
+  if (loading) {
+    return (
+      <div className="text-center text-muted-foreground">
+        No upcoming booked tours.
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4">

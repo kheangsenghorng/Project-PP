@@ -21,6 +21,7 @@ const Reviews = () => {
       fetchAllReviews(tourId);
     }
   }, [tourId, fetchAllReviews]);
+  console.log("Reviews:", reviews);
 
   const renderStars = (count) =>
     Array(5)
