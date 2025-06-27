@@ -125,7 +125,6 @@ export default function TourManagement() {
     })
     .slice(startIndex, startIndex + itemsPerPage);
 
-  console.log("Filtered Tours:", paginatedTours);
 
   const handlePrevPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);

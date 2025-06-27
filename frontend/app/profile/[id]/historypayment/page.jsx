@@ -31,55 +31,6 @@ import { PaymentDetails } from "@/components/PaymentDetails";
 import { useTourHistoryStore } from "@/store/useTourHistoryStore";
 import { useParams } from "next/navigation";
 
-// Sample payment history data
-
-const paymentHistoryData = [
-  {
-    id: "PAY-001",
-    date: new Date("2023-12-15T14:30:00"),
-    amount: 1250.0,
-    method: "visa",
-    package: "Bangkok City Tour",
-    guests: 2,
-    status: "completed",
-  },
-  {
-    id: "PAY-002",
-    date: new Date("2023-12-10T09:15:00"),
-    amount: 3600.0,
-    method: "bank",
-    package: "Phuket Island Adventure",
-    guests: 4,
-    status: "completed",
-  },
-  {
-    id: "PAY-003",
-    date: new Date("2023-11-28T16:45:00"),
-    amount: 950.0,
-    method: "visa",
-    package: "Chiang Mai Cultural Tour",
-    guests: 1,
-    status: "completed",
-  },
-  {
-    id: "PAY-004",
-    date: new Date("2023-11-20T11:30:00"),
-    amount: 2800.0,
-    method: "bank",
-    package: "Krabi Beach Getaway",
-    guests: 3,
-    status: "completed",
-  },
-  {
-    id: "PAY-005",
-    date: new Date("2023-11-05T10:00:00"),
-    amount: 1800.0,
-    method: "visa",
-    package: "Ayutthaya Historical Park",
-    guests: 2,
-    status: "completed",
-  },
-];
 
 const PaymentHistoryTable = () => {
   const [sortField, setSortField] = useState("date");
@@ -99,8 +50,6 @@ const PaymentHistoryTable = () => {
     }
   }, [params.id]);
 
-  console.log("Payment History Data:", bookings);
-
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection(sortDirection === "asc" ? "desc" : "asc");
@@ -109,26 +58,6 @@ const PaymentHistoryTable = () => {
       setSortDirection("asc");
     }
   };
-
-  // const sortedData = [...paymentHistoryData].sort((a, b) => {
-  //   if (sortField === "date") {
-  //     return sortDirection === "asc"
-  //       ? a.date.getTime() - b.date.getTime()
-  //       : b.date.getTime() - a.date.getTime();
-  //   } else if (sortField === "amount") {
-  //     return sortDirection === "asc"
-  //       ? a.amount - b.amount
-  //       : b.amount - a.amount;
-  //   } else if (sortField === "guests") {
-  //     return sortDirection === "asc"
-  //       ? a.guests - b.guests
-  //       : b.guests - a.guests;
-  //   } else {
-  //     return sortDirection === "asc"
-  //       ? a[sortField].localeCompare(b[sortField])
-  //       : b[sortField].localeCompare(a[sortField]);
-  //   }
-  // });
 
   return (
     <div className="rounded-md border">
@@ -177,7 +106,7 @@ const PaymentHistoryTable = () => {
                   <ChevronDown className="inline ml-1 h-4 w-4" />
                 ))}
             </TableHead>
-            {/* <TableHead
+            <TableHead
               className="cursor-pointer"
               onClick={() => handleSort("method")}
             >
@@ -188,7 +117,7 @@ const PaymentHistoryTable = () => {
                 ) : (
                   <ChevronDown className="inline ml-1 h-4 w-4" />
                 ))}
-            </TableHead> */}
+            </TableHead>
             <TableHead
               className="cursor-pointer"
               onClick={() => handleSort("package")}

@@ -51,8 +51,7 @@ export const formatTour = async (tour, req) => {
   return {
     ...tour.toObject(), // Ensure plain JS object
     galleryImages:
-      tour.galleryImages?.map((image) => `${baseUrl}/uploads/tours/${image}`) ||
-      [],
+      tour.galleryImages?.map((image) => `${baseUrl}/${image}`) || [],
     averageRating,
     totalReviews,
   };
@@ -63,7 +62,7 @@ export const getToursByAccommodation = async (req, res) => {
   const { accommodation } = req.query; // Expected: "10100000"
 
   // Validate input format
-  if (!accommodation || !/^[01]{8}$/.test(accommodation)) {
+  if (!accommodation || !/^[01]{10}$/.test(accommodation)) {
     return res.status(400).json({
       message: "Accommodation must be an 8-character string of '0' or '1'.",
     });
@@ -73,10 +72,10 @@ export const getToursByAccommodation = async (req, res) => {
     const allTours = await Tour.find();
 
     const matchedTours = allTours.filter((tour) => {
-      if (!tour.accommodation || tour.accommodation.length !== 8) return false;
+      if (!tour.accommodation || tour.accommodation.length !== 10) return false;
 
       // Match only if each "1" in the query is present in the tour's accommodation
-      for (let i = 0; i < 8; i++) {
+      for (let i = 0; i < 10; i++) {
         if (accommodation[i] === "1" && tour.accommodation[i] !== "1") {
           return false;
         }

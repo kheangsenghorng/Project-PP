@@ -208,22 +208,24 @@ export default function Home() {
                 {/* Info */}
                 <div className="p-6 flex flex-col w-full relative">
                   {/* Favorite Button */}
-                  <div className="absolute top-4 right-4">
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      onClick={() => handleFavoriteClick(tour._id)}
-                      className="hover:bg-rose-50"
-                    >
-                      <Heart
-                        className={`h-5 w-5 ${
-                          isFavorite(tour._id)
-                            ? "fill-rose-500 text-rose-500"
-                            : ""
-                        }`}
-                      />
-                    </Button>
-                  </div>
+                  {userId && (
+                    <div className="absolute top-4 right-4">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => handleFavoriteClick(tour._id)}
+                        className="hover:bg-rose-50"
+                      >
+                        <Heart
+                          className={`h-5 w-5 ${
+                            isFavorite(tour._id)
+                              ? "fill-rose-500 text-rose-500"
+                              : ""
+                          }`}
+                        />
+                      </Button>
+                    </div>
+                  )}
 
                   <div>
                     <div className="mb-3 flex gap-2 flex-wrap">
