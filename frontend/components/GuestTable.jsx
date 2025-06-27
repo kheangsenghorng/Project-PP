@@ -110,7 +110,7 @@ export default function GuestTable() {
           <p className="ml-3 text-gray-600">Loading bookings...</p>
         </div>
       ) : error ? (
-        <div className="bg-red-50 text-red-600 p-4 rounded-lg">{error}</div>
+        <div className="bg-red-50 p-4 rounded-lg">{error}</div>
       ) : bookings.length === 0 ? (
         <div className="text-center py-8 text-gray-500">
           <div className="mb-3">

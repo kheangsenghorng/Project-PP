@@ -118,7 +118,7 @@ const CardTour = () => {
     <section className="py-8">
       <div className="container mx-auto px-4 max-w-screen-xl">
         {/* Only show "Best Selections" if user has favorites */}
-        {id && favorites.length > 0 && (
+        {displayedTours.length > 0 && (
           <h4 className="mb-6 text-2xl font-semibold border-b pb-2">
             Best Selections
           </h4>

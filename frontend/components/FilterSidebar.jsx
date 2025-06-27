@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 
 const FilterSidebar = () => {
   const [participants, setParticipants] = useState(13);
-  const [priceRange, setPriceRange] = useState({ min: '', max: '' });
+  const [priceRange, setPriceRange] = useState({ min: "", max: "" });
 
   const [accommodation, setAccommodation] = useState({
     ac: 0,
@@ -39,9 +39,9 @@ const FilterSidebar = () => {
   const convertToBinaryString = (acc) => {
     return Object.values(acc)
       .map((val) => (val ? "1" : "0"))
-      .slice(0, 8)
+      .slice(0, 10)
       .join("")
-      .padEnd(8, "0");
+      .padEnd(10, "0");
   };
 
   const handlePriceChange = (type, value) => {
@@ -139,6 +139,34 @@ const FilterSidebar = () => {
           </label>
         ))}
       </div>
+
+      {/* Availability and Travel Type (optional) */}
+      {/* <div className="mb-4">
+        <h3 className="font-semibold mb-2">Availability</h3>
+        <select
+          value={tourAvailability}
+          onChange={handleAvailabilityChange}
+          className="border rounded p-2 w-full"
+        >
+          <option value="all">All</option>
+          <option value="available">Available Only</option>
+          <option value="unavailable">Unavailable Only</option>
+        </select>
+      </div> */}
+
+      {/* <div className="mb-4">
+        <h3 className="font-semibold mb-2">Travel Type</h3>
+        <select
+          value={travelType}
+          onChange={handleTravelTypeChange}
+          className="border rounded p-2 w-full"
+        >
+          <option value="all">All</option>
+          <option value="adventure">Adventure</option>   
+          <option value="leisure">Leisure</option>
+          <option value="cultural">Cultural</option>
+        </select>
+      </div> */}
     </div>
   );
 };
